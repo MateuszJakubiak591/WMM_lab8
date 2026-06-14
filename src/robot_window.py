@@ -1,8 +1,8 @@
 import moderngl
 from pyrr import Matrix44, Vector3
 
-import models
 from base_window import BaseWindow
+from robot_scene import create_robot_parts, load_robot_models
 
 class RobotWindow(BaseWindow):
 
@@ -10,12 +10,13 @@ class RobotWindow(BaseWindow):
         super(RobotWindow, self).__init__(**kwargs)
 
     def load_models(self):
-        # TODO: Write model loading
-        pass
+        self.models = load_robot_models(self.program)
 
     def init_shaders_variables(self):
-        # TODO: Write init shader variables
-        pass
+        self.projection_uniform = self.program["projection"]
+        self.view_uniform = self.program["view"]
+        self.model_uniform = self.program["model"]
+        self.color_uniform = self.program["color"]
 
     def on_render(self, time: float, frame_time: float):
         self.ctx.clear(0.1, 0.2, 0.3, 0.0)
@@ -28,4 +29,11 @@ class RobotWindow(BaseWindow):
             (0.0, 1.0, 0.0),
         )
 
-        # TODO: Write render part
+        self.projection_uniform.write(projection.astype("f4"))
+        self.view_uniform.write(view.astype("f4"))
+
+        # Each part gets its own model matrix and flat colour.
+        for part in create_robot_parts():
+            self.model_uniform.write(part.model_matrix.astype("f4"))
+            self.color_uniform.value = part.color
+            self.models[part.model_name].render(moderngl.TRIANGLES)

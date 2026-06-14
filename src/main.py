@@ -58,5 +58,6 @@ class TaskType(Enum):
 
 
 if __name__ == '__main__':
-    task = TaskType.DEFAULT
+    # Change this value to ANIM, PHONG or BLINN_PHONG to run another exercise.
+    task = TaskType.ROBOT
     moderngl_window.run_window_config(task.window_cls, args=task.window_args)
