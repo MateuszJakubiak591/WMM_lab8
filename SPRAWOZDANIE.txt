@@ -30,6 +30,16 @@ Zmienione i dodane pliki
 
 Zadanie 1 - skladanie transformacji
 -----------------------------------
+Pliki zmodyfikowane lub dodane w celu wykonania zadania:
+- src/robot_scene.py - definicja czesci robota, macierzy transformacji,
+  personalizacji na podstawie numeru indeksu oraz ladowania modeli.
+- src/robot_window.py - przesylanie macierzy i kolorow do shaderow oraz
+  renderowanie wszystkich czesci robota.
+- resources/shaders/robot/robot.vert - przeksztalcenie wierzcholkow macierzami
+  projekcji, widoku i modelu.
+- resources/shaders/robot/robot.frag - nadawanie jednolitego koloru czesciom.
+- src/main.py - dodanie i ustawienie uruchamiania wariantu TaskType.ROBOT.
+
 Robot zostal zbudowany z przeskalowanych, obroconych i przesunietych szescianow.
 Macierze modelu sa tworzone w kazdej klatce jako zlozenie translacji, rotacji i
 skalowania. Vertex shader przeksztalca wierzcholki wedlug wzoru:
@@ -46,6 +56,15 @@ Wizualizacja: screenshots/robot.png
 
 Zadanie 2 - animacja geometrii
 ------------------------------
+Pliki zmodyfikowane w celu wykonania zadania:
+- src/robot_scene.py - obliczanie harmonicznego kata ruchu oraz skladanie
+  transformacji rak obracanych wokol barkow.
+- src/anim_window.py - przekazywanie czasu do sceny i renderowanie kolejnych
+  klatek animacji.
+- src/main.py - udostepnienie wariantu TaskType.ANIM.
+- resources/shaders/robot/robot.vert i robot.frag - renderowanie animowanych
+  czesci z wykorzystaniem zmienianych macierzy modelu.
+
 Animowane sa obie rece robota, poruszajace sie w przeciwfazie. Kat jest obliczany
 po stronie CPU wedlug wzorow:
 left_angle = A * sin(omega * time)
@@ -62,6 +81,19 @@ Wizualizacje: screenshots/animacja_faza_1.png i screenshots/animacja_faza_2.png
 
 Zadanie 3 - modele oswietlenia
 ------------------------------
+Pliki zmodyfikowane w celu wykonania zadania:
+- src/phong_window.py - ustawienie parametrow materialu, kamery i ruchomego
+  zrodla swiatla oraz renderowanie modelu Phonga.
+- src/blinn_phong_window.py - ustawienie tych samych parametrow sceny dla
+  modelu Blinna-Phonga.
+- resources/shaders/phong/phong.vert i phong.frag - przekazanie pozycji oraz
+  normalnych i obliczanie skladowych ambient, diffuse i specular Phonga.
+- resources/shaders/blinn_phong/blinn_phong.vert i blinn_phong.frag -
+  przekazanie pozycji oraz normalnych i obliczanie refleksu Blinna-Phonga.
+- src/robot_scene.py - wspolna geometria, transformacje i kolory oswietlanego
+  robota.
+- src/main.py - udostepnienie wariantow TaskType.PHONG i TaskType.BLINN_PHONG.
+
 W obu wariantach obliczane sa skladowe ambient, diffuse i specular. Pozycja
 wierzcholka oraz normalna sa przekazywane do fragment shadera w przestrzeni
 swiata. Normalna jest przeksztalcana macierza:
