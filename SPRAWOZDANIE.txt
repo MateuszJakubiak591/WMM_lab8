@@ -1,167 +1,103 @@
-WMM - Laboratorium 8: Generowanie grafiki z wykorzystaniem OpenGL
+WMM - Laboratorium 8
+Zadanie 1: Skladanie transformacji
 Autor: Mateusz Jakubiak
+Numer indeksu: 318661
 
 Uruchomienie
 ------------
-Utworzenie i aktywacja srodowiska wirtualnego w systemie Linux/WSL:
-python3.11 -m venv .venv
+Utworzenie i aktywacja srodowiska wirtualnego w Linux/WSL:
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-Katalog .venv zostal dodany do pliku .gitignore.
-Program uruchamia sie poleceniem:
-python src/main.py
+Uruchomienie programu:
+python3 src/main.py
 
-Wybor zadania odbywa sie przez zmiane wartosci task w pliku src/main.py na:
-TaskType.ROBOT, TaskType.ANIM, TaskType.PHONG lub TaskType.BLINN_PHONG.
+Wykonany zakres
+---------------
+Wykonano tylko Zadanie 1. Pliki dotyczace animacji oraz modeli oswietlenia
+Phonga i Blinna-Phonga pozostawiono w stanie poczatkowym z TODO.
 
-Zmienione i dodane pliki
-------------------------
-- src/main.py - ustawienie domyslnego uruchamiania sceny robota.
-- src/robot_scene.py - wspolne modele, transformacje, kolory i personalizacja robota.
-- src/robot_window.py - renderowanie robota z plaskimi kolorami.
-- src/anim_window.py - harmoniczna animacja obu rak.
-- src/phong_window.py - parametry materialu oraz ruchomego swiatla dla modelu Phonga.
-- src/blinn_phong_window.py - parametry materialu oraz ruchomego swiatla dla modelu Blinna-Phonga.
-- resources/shaders/robot/robot.vert i robot.frag - transformacja P*V*M oraz plaski kolor.
-- resources/shaders/phong/phong.vert i phong.frag - model oswietlenia Phonga.
-- resources/shaders/blinn_phong/blinn_phong.vert i blinn_phong.frag - model oswietlenia Blinna-Phonga.
-- .gitignore - wykluczenie srodowisk wirtualnych i plikow tymczasowych.
-
-Zadanie 1 - skladanie transformacji
------------------------------------
-Pliki zmodyfikowane lub dodane w celu wykonania zadania:
-- src/robot_scene.py - caly plik zostal dodany. Dopisano stale STUDENT_INDEX,
-  COLOR_ID i ELEMENT_ID oraz tablice HEAD_COLORS, z ktorej wybierany jest kolor
-  glowy. Dodano klase RobotPart przechowujaca nazwe modelu, macierz modelu i
-  kolor. Funkcja _transform() sklada translacje, obrot wokol osi Z i skalowanie.
-  W funkcji create_robot_parts() dopisano macierze glowy, ciala, rak i nog oraz
-  wybor dodatkowej bryly na podstawie ELEMENT_ID. Dla indeksu 318661 wykonywana
-  jest galaz ELEMENT_ID == 1, ktora dodaje model "sphere" przy prawej rece.
-  Funkcja load_robot_models() laduje VAO szescianu, ostroslupa, kuli i torusa.
-- src/robot_window.py - uzupelniono metode load_models(), przypisujac modele
-  zwrocone przez load_robot_models(). W init_shaders_variables() pobrano
-  uniformy projection, view, model i color. W on_render() dopisano przesylanie
-  macierzy projekcji i widoku oraz petle po create_robot_parts(). Dla kazdej
-  czesci petla przesyla osobna macierz modelu i kolor, po czym wywoluje render().
-- resources/shaders/robot/robot.vert - caly plik zostal dodany. Zadeklarowano
-  wejscie in_position oraz uniformy projection, view i model. W funkcji main()
-  dopisano transformacje:
-  gl_Position = projection * view * model * vec4(in_position, 1.0).
-- resources/shaders/robot/robot.frag - caly plik zostal dodany. Zadeklarowano
-  uniform vec3 color i wyjscie f_color. W main() kolor czesci jest zapisywany
-  jako f_color = vec4(color, 1.0).
-- src/main.py - zmieniono domyslna wartosc task z TaskType.DEFAULT na
-  TaskType.ROBOT oraz dopisano komentarz informujacy, jak wybrac pozostale
-  warianty zadania.
-
-Robot zostal zbudowany z przeskalowanych, obroconych i przesunietych szescianow.
-Macierze modelu sa tworzone w kazdej klatce jako zlozenie translacji, rotacji i
-skalowania. Vertex shader przeksztalca wierzcholki wedlug wzoru:
-gl_Position = projection * view * model * vec4(in_position, 1.0).
-
-Uzyty numer indeksu: 318661
+Personalizacja robota
+---------------------
+STUDENT_INDEX = 318661
 color_id = 318661 mod 8 = 5
 element_id = 318661 mod 3 = 1
 
-Glowa robota jest niebieska (RGB 0.0, 0.2, 1.0), a dodatkowa bryla to kula
-przyczepiona do prawej reki. Jest to spersonalizowana wizualizacja inna od
-podstawowego robota z instrukcji.
-Wizualizacja: screenshots/robot.png
+Wynik color_id = 5 wybiera niebieski kolor glowy RGB (0.0, 0.2, 1.0).
+Wynik element_id = 1 wybiera kule przyczepiona do prawej reki robota.
+Wizualizacja wyniku znajduje sie w pliku screenshots/robot.png.
 
-Zadanie 2 - animacja geometrii
-------------------------------
-Pliki zmodyfikowane w celu wykonania zadania:
-- src/robot_scene.py - dopisano funkcje _arm_transform(shoulder, angle), ktora
-  sklada macierz T_shoulder * Rz(angle) * T_local * S. Translacja shoulder
-  ustawia punkt obrotu przy barku, a T_local przesuwa srodek szescianu reki
-  ponizej tego punktu. W create_robot_parts(animation_time) dopisano galaz dla
-  animacji. Oblicza ona angle = radians(45.0) * sin(2.0 * animation_time), a
-  nastepnie tworzy macierze lewej i prawej reki z katami angle oraz -angle.
-- src/anim_window.py - uzupelniono load_models() i init_shaders_variables()
-  analogicznie do RobotWindow. W on_render() dopisano przesylanie macierzy
-  projection i view. Najwazniejsza zmiana to wywolanie
-  create_robot_parts(animation_time=time), dzieki ktoremu czas kolejnej klatki
-  zmienia macierze modelu rak. Petla przesyla nowe macierze do uniformu model.
-- resources/shaders/robot/robot.vert - animacja korzysta z dopisanej obslugi
-  uniformu model. Shader wykonuje transformacje P * V * M dla macierzy modelu
-  aktualizowanej w kazdej klatce.
-- resources/shaders/robot/robot.frag - animowane czesci zachowuja kolory
-  przesylane przez uniform color.
-- src/main.py - dopisany komentarz przy zmiennej task wskazuje, ze uruchomienie
-  animacji wymaga ustawienia task = TaskType.ANIM.
+Dokladny opis zmienionych fragmentow
+------------------------------------
 
-Animowane sa obie rece robota, poruszajace sie w przeciwfazie. Kat jest obliczany
-po stronie CPU wedlug wzorow:
-left_angle = A * sin(omega * time)
-right_angle = -A * sin(omega * time)
+1. src/robot_window.py
 
-A = 45 stopni, omega = 2.0 rad/s.
+Dopisano stala STUDENT_INDEX = 318661 oraz tablice HEAD_COLORS zawierajaca
+osiem kolorow wymaganych w instrukcji. Kolor glowy jest wybierany instrukcja:
+head_color = HEAD_COLORS[STUDENT_INDEX % 8].
 
-Transformacja reki ma postac:
-M = T_shoulder * Rz(angle) * T_local * S
-Dzieki translacji T_shoulder reka obraca sie wokol barku, a nie wokol swojego
-srodka. Dwie rozne fazy animacji mozna zaobserwowac dla sin(omega*time) = -1
-oraz sin(omega*time) = 1; wtedy wychylenia rak zamieniaja sie stronami.
-Wizualizacje: screenshots/animacja_faza_1.png i screenshots/animacja_faza_2.png
+Uzupelniono metode load_models(). Zamiast TODO i pass metoda laduje przez
+funkcje z models.py cztery dostepne geometrie:
+- models.load_cube(self.program),
+- models.load_pyramid(self.program),
+- models.load_sphere(self.program),
+- models.load_torus(self.program).
+Modele sa zapisane w slowniku self.models, aby wybrana bryle mozna bylo
+renderowac na podstawie jej nazwy.
 
-Zadanie 3 - modele oswietlenia
-------------------------------
-Pliki zmodyfikowane w celu wykonania zadania:
-- src/phong_window.py - uzupelniono load_models() przez zaladowanie geometrii
-  robota. W init_shaders_variables() pobrano uniformy projection, view, model,
-  light_position i material_diffuse. Ustawiono stale parametry swiatla:
-  light_ambient, light_diffuse i light_specular, parametry materialu:
-  material_ambient, material_specular i material_shininess = 50.0 oraz pozycje
-  kamery (-3.0, 5.0, 15.0). W on_render() dopisano ruch swiatla po okregu:
-  (8.0 * sin(time), 8.0, 8.0 * cos(time)). Petla renderujaca przesyla macierz
-  kazdej czesci oraz jej kolor jako material_diffuse.
-- src/blinn_phong_window.py - uzupelniono te same metody, uniformy i parametry
-  co w PhongWindow. Zastosowano identyczna pozycje kamery, material oraz ruch
-  swiatla, aby roznice na wizualizacjach wynikaly z modelu refleksu, a nie z
-  innych ustawien sceny.
-- resources/shaders/phong/phong.vert - dopisano wejscie in_normal, uniformy
-  projection, view i model oraz wyjscia v_position i v_normal. Pozycja jest
-  przeksztalcana do przestrzeni swiata instrukcja
-  v_position = (model * vec4(in_position, 1.0)).xyz. Normalna korzysta z
-  macierzy normalnych mat3(transpose(inverse(model))). Na koncu dopisano
-  standardowa transformacje gl_Position = projection * view * model * vertex.
-- resources/shaders/phong/phong.frag - dopisano wejscia v_position i v_normal
-  oraz wszystkie uniformy swiatla, materialu i kamery. W main() wyznaczane sa
-  wektory N, L, V i odbity wektor R = reflect(-L, N). Dopisano obliczenia
-  ambient, diffuse oraz klasycznego refleksu Phonga:
-  pow(max(dot(V, R), 0.0), material_shininess). Suma skladowych jest ograniczana
-  funkcja clamp() i zapisywana do f_color.
-- resources/shaders/blinn_phong/blinn_phong.vert - dopisano taki sam zestaw
-  wejsc, uniformow, wyjsc i transformacji jak w phong.vert, aby fragment shader
-  otrzymywal pozycje i poprawnie przeksztalcona normalna w przestrzeni swiata.
-- resources/shaders/blinn_phong/blinn_phong.frag - dopisano uniformy i
-  obliczenia ambient oraz diffuse takie jak w modelu Phonga. Zamiast wektora
-  odbitego R obliczany jest wektor posredni H = normalize(L + V). Refleks
-  Blinna-Phonga jest wyznaczany wzorem
-  pow(max(dot(N, H), 0.0), material_shininess).
-- src/robot_scene.py - funkcja load_robot_models() dostarcza modele zawierajace
-  pozycje wierzcholkow i normalne, a create_robot_parts() dostarcza macierze
-  modelu oraz kolory uzywane jako material_diffuse w obu modelach oswietlenia.
-- src/main.py - dopisany komentarz przy zmiennej task informuje o mozliwosci
-  ustawienia TaskType.PHONG albo TaskType.BLINN_PHONG.
+Uzupelniono metode init_shaders_variables(). Pobrano lokacje czterech
+zmiennych uniform programu shaderowego:
+- projection - macierz projekcji,
+- view - macierz widoku,
+- model - macierz modelu aktualnie renderowanej czesci,
+- color - jednolity kolor aktualnie renderowanej czesci.
 
-W obu wariantach obliczane sa skladowe ambient, diffuse i specular. Pozycja
-wierzcholka oraz normalna sa przekazywane do fragment shadera w przestrzeni
-swiata. Normalna jest przeksztalcana macierza:
-mat3(transpose(inverse(model))).
+Dopisano metode create_model_matrix(translation, scale, z_rotation). Metoda
+sklada macierz modelu wedlug wzoru:
+M = T * Rz * S
+gdzie T to Matrix44.from_translation(), Rz to Matrix44.from_z_rotation(), a S
+to Matrix44.from_scale().
 
-Model Phonga wyznacza refleks na podstawie wektora odbitego R i wektora do
-kamery V. Model Blinna-Phonga wykorzystuje wektor posredni H = normalize(L+V).
-Przy tych samych parametrach Blinn-Phong daje zwykle szerszy, lagodniejszy
-refleks, a klasyczny Phong bardziej skupiony refleks zalezny od kierunku odbicia.
+Dopisano metode create_robot_parts(). Tworzy ona liste czesci robota. Kazdy
+element listy zawiera nazwe geometrii, macierz modelu oraz kolor. Zastosowane
+transformacje:
+- glowa: translacja (0, 5, 0), skala (1.5, 1.5, 1.5),
+- cialo: translacja (0, 2, 0), skala (2, 4, 2),
+- lewa reka: translacja (-2.5, 4, 0), obrot +45 stopni, skala (0.75, 2.5, 0.75),
+- prawa reka: translacja (2.5, 4, 0), obrot -45 stopni, skala (0.75, 2.5, 0.75),
+- lewa noga: translacja (-2, -2, 0), obrot -30 stopni, skala (1, 3, 1),
+- prawa noga: translacja (2, -2, 0), obrot +30 stopni, skala (1, 3, 1).
 
-Dynamika oswietlenia polega na ruchu zrodla swiatla po okregu wokol robota:
-light_position = (8*sin(time), 8, 8*cos(time)).
-Pozwala to obserwowac przesuwanie sie jasnych obszarow i refleksow na brylach
-dla roznych polozen swiatla, np. (0, 8, 8) oraz (8, 8, 0).
+W create_robot_parts() dopisano instrukcje if/elif/else wybierajaca dodatkowa
+bryle na podstawie element_id. Dla indeksu 318661 wykonywana jest galaz
+element_id == 1, ktora dodaje niebieska kule w pozycji (3.5, 2.75, 0).
 
-Wizualizacje:
-- screenshots/phong.png - model Phonga, swiatlo w polozeniu (0, 8, 8).
-- screenshots/blinn_phong.png - model Blinna-Phonga, swiatlo w polozeniu (0, 8, 8).
-- screenshots/phong_zmienione_swiatlo.png - model Phonga, swiatlo w polozeniu (8, 8, 0).
+Uzupelniono metode on_render(). Istniejace macierze projection i view sa
+przesylane do shaderow. Nastepnie petla przechodzi po czesciach zwroconych
+przez create_robot_parts(). Dla kazdej czesci przesyla do uniformow jej macierz
+modelu i kolor, po czym renderuje odpowiedni VAO przez moderngl.TRIANGLES.
+
+2. resources/shaders/robot/robot.vert
+
+Dodano caly vertex shader dla Zadania 1. Zadeklarowano wejscie in_position oraz
+uniformy projection, view i model. W funkcji main() pozycja wierzcholka jest
+przeksztalcana ze wspolrzednych modelu do przestrzeni obrazu:
+gl_Position = projection * view * model * vec4(in_position, 1.0)
+
+3. resources/shaders/robot/robot.frag
+
+Dodano caly fragment shader dla Zadania 1. Zadeklarowano uniform vec3 color
+oraz wyjscie out vec4 f_color. W main() wszystkim fragmentom danej czesci
+nadawany jest kolor przeslany z kodu Python:
+f_color = vec4(color, 1.0)
+
+4. src/main.py
+
+Zmieniono domyslnie uruchamiane okno z TaskType.DEFAULT na TaskType.ROBOT.
+Dopisano komentarz informujacy, ze uruchamiana jest scena Zadania 1.
+
+5. .gitignore
+
+Plik pozostawiono, aby wykluczyc srodowiska .venv/ i venv/, pliki __pycache__,
+pliki IDE oraz Zone.Identifier.
