@@ -1,11 +1,11 @@
 WMM - Laboratorium 8
-Zadanie 1: Skladanie transformacji
+Zadanie 1: Składanie transformacji
 Autor: Mateusz Jakubiak
 Numer indeksu: 318661
 
 Uruchomienie
 ------------
-Utworzenie i aktywacja srodowiska wirtualnego w Linux/WSL:
+Utworzenie i aktywacja środowiska wirtualnego w Linux/WSL:
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -15,8 +15,8 @@ python3 src/main.py
 
 Wykonany zakres
 ---------------
-Wykonano tylko Zadanie 1. Pliki dotyczace animacji oraz modeli oswietlenia
-Phonga i Blinna-Phonga pozostawiono w stanie poczatkowym z TODO.
+Wykonano wyłącznie Zadanie 1. Plik src/main.py uruchamia bezpośrednio scenę
+robota i nie zawiera możliwości wyboru niezaimplementowanych zadań.
 
 Personalizacja robota
 ---------------------
@@ -24,80 +24,84 @@ STUDENT_INDEX = 318661
 color_id = 318661 mod 8 = 5
 element_id = 318661 mod 3 = 1
 
-Wynik color_id = 5 wybiera niebieski kolor glowy RGB (0.0, 0.2, 1.0).
-Wynik element_id = 1 wybiera kule przyczepiona do prawej reki robota.
-Wizualizacja wyniku znajduje sie w pliku screenshots/robot.png.
+Wynik color_id = 5 wybiera niebieski kolor głowy RGB (0.0, 0.2, 1.0).
+Wynik element_id = 1 wybiera kulę przyczepioną do prawej ręki robota.
+Wizualizacja wyniku znajduje się w pliku screenshots/robot.png.
 
-Dokladny opis zmienionych fragmentow
+Dokładny opis zmienionych fragmentów
 ------------------------------------
 
 1. src/robot_window.py
 
-Dopisano stala STUDENT_INDEX = 318661 oraz tablice HEAD_COLORS zawierajaca
-osiem kolorow wymaganych w instrukcji. Kolor glowy jest wybierany instrukcja:
+Dopisano stałą STUDENT_INDEX = 318661 oraz tablicę HEAD_COLORS zawierającą
+osiem kolorów wymaganych w instrukcji. Kolor głowy jest wybierany instrukcją:
 head_color = HEAD_COLORS[STUDENT_INDEX % 8].
 
-Uzupelniono metode load_models(). Zamiast TODO i pass metoda laduje przez
-funkcje z models.py cztery dostepne geometrie:
+Uzupełniono metodę load_models(). Zamiast TODO i pass metoda ładuje przez
+funkcje z models.py cztery dostępne geometrie:
 - models.load_cube(self.program),
 - models.load_pyramid(self.program),
 - models.load_sphere(self.program),
 - models.load_torus(self.program).
-Modele sa zapisane w slowniku self.models, aby wybrana bryle mozna bylo
-renderowac na podstawie jej nazwy.
+Modele są zapisane w słowniku self.models, aby wybraną bryłę można było
+renderować na podstawie jej nazwy.
 
-Uzupelniono metode init_shaders_variables(). Pobrano lokacje czterech
+Uzupełniono metodę init_shaders_variables(). Pobrano lokalizacje czterech
 zmiennych uniform programu shaderowego:
 - projection - macierz projekcji,
 - view - macierz widoku,
-- model - macierz modelu aktualnie renderowanej czesci,
-- color - jednolity kolor aktualnie renderowanej czesci.
+- model - macierz modelu aktualnie renderowanej części,
+- color - jednolity kolor aktualnie renderowanej części.
 
-Dopisano metode create_model_matrix(translation, scale, z_rotation). Metoda
-sklada macierz modelu wedlug wzoru:
+Dopisano metodę create_model_matrix(translation, scale, z_rotation). Metoda
+składa macierz modelu według wzoru:
 M = T * Rz * S
 gdzie T to Matrix44.from_translation(), Rz to Matrix44.from_z_rotation(), a S
 to Matrix44.from_scale().
 
-Dopisano metode create_robot_parts(). Tworzy ona liste czesci robota. Kazdy
-element listy zawiera nazwe geometrii, macierz modelu oraz kolor. Zastosowane
+Dopisano metodę create_robot_parts(). Tworzy ona listę części robota. Każdy
+element listy zawiera nazwę geometrii, macierz modelu oraz kolor. Zastosowane
 transformacje:
-- glowa: translacja (0, 5, 0), skala (1.5, 1.5, 1.5),
-- cialo: translacja (0, 2, 0), skala (2, 4, 2),
-- lewa reka: translacja (-2.5, 4, 0), obrot +45 stopni, skala (0.75, 2.5, 0.75),
-- prawa reka: translacja (2.5, 4, 0), obrot -45 stopni, skala (0.75, 2.5, 0.75),
-- lewa noga: translacja (-2, -2, 0), obrot -30 stopni, skala (1, 3, 1),
-- prawa noga: translacja (2, -2, 0), obrot +30 stopni, skala (1, 3, 1).
+- głowa: translacja (0, 5, 0), skala (1.5, 1.5, 1.5),
+- ciało: translacja (0, 2, 0), skala (2, 4, 2),
+- lewa ręka: translacja (-2.5, 4, 0), obrót +45 stopni, skala (0.75, 2.5, 0.75),
+- prawa ręka: translacja (2.5, 4, 0), obrót -45 stopni, skala (0.75, 2.5, 0.75),
+- lewa noga: translacja (-2, -2, 0), obrót -30 stopni, skala (1, 3, 1),
+- prawa noga: translacja (2, -2, 0), obrót +30 stopni, skala (1, 3, 1).
 
-W create_robot_parts() dopisano instrukcje if/elif/else wybierajaca dodatkowa
-bryle na podstawie element_id. Dla indeksu 318661 wykonywana jest galaz
-element_id == 1, ktora dodaje niebieska kule w pozycji (3.5, 2.75, 0).
+W create_robot_parts() dopisano instrukcję if/elif/else wybierającą dodatkową
+bryłę na podstawie element_id. Dla indeksu 318661 wykonywana jest gałąź
+element_id == 1, która dodaje niebieską kulę w pozycji (3.5, 2.75, 0).
 
-Uzupelniono metode on_render(). Istniejace macierze projection i view sa
-przesylane do shaderow. Nastepnie petla przechodzi po czesciach zwroconych
-przez create_robot_parts(). Dla kazdej czesci przesyla do uniformow jej macierz
+Uzupełniono metodę on_render(). Istniejące macierze projection i view są
+przesyłane do shaderów. Następnie pętla przechodzi po częściach zwróconych
+przez create_robot_parts(). Dla każdej części przesyła do uniformów jej macierz
 modelu i kolor, po czym renderuje odpowiedni VAO przez moderngl.TRIANGLES.
 
 2. resources/shaders/robot/robot.vert
 
-Dodano caly vertex shader dla Zadania 1. Zadeklarowano wejscie in_position oraz
-uniformy projection, view i model. W funkcji main() pozycja wierzcholka jest
-przeksztalcana ze wspolrzednych modelu do przestrzeni obrazu:
+Dodano cały vertex shader dla Zadania 1. Zadeklarowano wejście in_position oraz
+uniformy projection, view i model. W funkcji main() pozycja wierzchołka jest
+przekształcana ze współrzędnych modelu do przestrzeni obrazu:
 gl_Position = projection * view * model * vec4(in_position, 1.0)
 
 3. resources/shaders/robot/robot.frag
 
-Dodano caly fragment shader dla Zadania 1. Zadeklarowano uniform vec3 color
-oraz wyjscie out vec4 f_color. W main() wszystkim fragmentom danej czesci
-nadawany jest kolor przeslany z kodu Python:
+Dodano cały fragment shader dla Zadania 1. Zadeklarowano uniform vec3 color
+oraz wyjście out vec4 f_color. W main() wszystkim fragmentom danej części
+nadawany jest kolor przesłany z kodu Python:
 f_color = vec4(color, 1.0)
 
 4. src/main.py
 
-Zmieniono domyslnie uruchamiane okno z TaskType.DEFAULT na TaskType.ROBOT.
-Dopisano komentarz informujacy, ze uruchamiana jest scena Zadania 1.
+Usunięto mechanizm wyboru zadania oparty na Task, TaskType i Enum oraz importy
+BaseWindow, AnimWindow, PhongWindow i BlinnPhongWindow. Plik importuje wyłącznie
+RobotWindow i bezpośrednio wywołuje moderngl_window.run_window_config().
+Do wywołania przekazywane są tylko argumenty shaderów Zadania 1:
+--shaders_dir_path=./resources/shaders/robot
+--shader_name=robot
 
 5. .gitignore
 
-Plik pozostawiono, aby wykluczyc srodowiska .venv/ i venv/, pliki __pycache__,
+Plik pozostawiono, aby wykluczyć środowiska .venv/ i venv/, pliki __pycache__,
 pliki IDE oraz Zone.Identifier.
